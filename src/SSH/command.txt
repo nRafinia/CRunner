@@ -1,0 +1,4 @@
+show run int gi0/1
+sleep:3000
+wr
+sleep:3000
