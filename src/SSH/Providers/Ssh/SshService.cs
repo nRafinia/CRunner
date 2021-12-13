@@ -61,13 +61,21 @@ public class SshService
             if (cmd.StartsWith("sleep"))
             {
                 var sleep = cmd.Split(":");
-                await Task.Delay(int.Parse(sleep[1]));
+                //await Task.Delay(int.Parse(sleep[1]));
+                var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(int.Parse(sleep[1])));
+                await periodicTimer.WaitForNextTickAsync();
+                periodicTimer.Dispose();
                 continue;
             }
 
-            stream.WriteLine(cmd);
+            //stream.WriteLine(cmd);
+            foreach (var c in cmd)
+            {
+                stream.WriteByte((byte)c);
+                await stream.FlushAsync();
+            }
+            stream.WriteByte(13);
             await stream.FlushAsync();
-
         }
 
         client.Disconnect();

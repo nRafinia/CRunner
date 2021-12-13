@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>E:\Projects\SSH\SSH\Properties\PublishProfiles\Publish_Windows_64.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>D:\Projects\Github\F4ST\Command-Runner\src\SSH\Properties\PublishProfiles\win_64.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
 </Project>

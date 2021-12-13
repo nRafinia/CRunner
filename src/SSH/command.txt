@@ -1,4 +1,4 @@
-show run int gi0/1
+/ip address print
 sleep:3000
-wr
+/ip address print
 sleep:3000
