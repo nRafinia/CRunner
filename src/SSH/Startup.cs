@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SSH.Providers.Ssh;
+using SSH.Providers.Telnet;
 
 namespace SSH;
 
@@ -29,9 +29,12 @@ public class Startup
         {
             try
             {
-                var ssh = _provider.GetService<SshService>();
+                /*var ssh = _provider.GetService<SshService>();
                 ssh.Connect(ip, sec[0], sec[1]);
-                await ssh.Run(sec, commands);
+                await ssh.Run(sec, commands);*/
+                var telnet = _provider.GetService<TelnetService>();
+                telnet.Connect(ip, sec[0], sec[1]);
+                await telnet.Run(sec, commands);
             }
             catch (Exception e)
             {
@@ -45,6 +48,10 @@ public class Startup
 
         Console.ForegroundColor = ConsoleColor.Gray;
         Console.WriteLine("Finished.");
+
+        Console.WriteLine("");
+        Console.Write("Press Enter to exit....");
+        Console.ReadLine();
     }
 
     private async Task LoadFiles()

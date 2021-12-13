@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SSH;
-using SSH.Providers.Ssh;
+using SSH.Providers.Telnet;
+
 
 var serviceProvider = new ServiceCollection()
     .AddSingleton<Startup>()
-    .AddSingleton<SshService>()
+    //.AddSingleton<SshService>()
+    .AddSingleton<TelnetService>()
     .BuildServiceProvider();
 
 var startup = serviceProvider.GetService<Startup>();
