@@ -5,7 +5,7 @@ Easy write commands and run multiple server
 ```
   Address:
     IP:
-      192.168.1.1:      
+      192.168.1.1:
   Security:
     UserName: admin
     Password: admin
