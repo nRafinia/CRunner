@@ -1,0 +1,4 @@
+/ip address print
+sleep:3000
+/ip address print
+sleep:3000
