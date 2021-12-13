@@ -1,18 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using SSH.Providers.Telnet;
+﻿using CRunner.Models;
+using CRunner.Providers;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SSH;
+namespace CRunner;
 
 public class Startup
 {
-    private string[] ips;
-    private string[] commands;
-    private string[] sec;
-
     private readonly IServiceProvider _provider;
-    public Startup(IServiceProvider provider)
+    private readonly RunSetting _setting;
+    private readonly Logger _logger;
+
+    public Startup(IServiceProvider provider, RunSetting setting, Logger logger)
     {
         _provider = provider;
+        _setting = setting;
+        _logger = logger;
     }
 
     public async Task Start()
@@ -20,45 +22,41 @@ public class Startup
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.CursorVisible = false;
 
-        Console.WriteLine("Starting...");
-        Console.WriteLine("");
+        _logger.WriteLineGray("Starting...");
+        _logger.WriteLine("");
 
-        await LoadFiles();
-
+        var ips = _setting.Address.IP;
         foreach (var ip in ips)
         {
             try
             {
-                /*var ssh = _provider.GetService<SshService>();
-                ssh.Connect(ip, sec[0], sec[1]);
-                await ssh.Run(sec, commands);*/
-                var telnet = _provider.GetService<TelnetService>();
-                telnet.Connect(ip, sec[0], sec[1]);
-                await telnet.Run(sec, commands);
+                var security = ip.Value == null
+                    ? _setting.Security
+                    : ip.Value;
+
+                var ssh = _provider.GetService<SshService>();
+                ssh.Connect(ip.Key, security);
+                await ssh.Run(_setting.Commands.Lines);
+
+                /*var telnet = _provider.GetService<TelnetService>();
+                telnet.Connect(ip.Key, security);
+                await telnet.Run(_setting.Commands.Lines);*/
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("");
-                Console.WriteLine($"Error in connect to {ip}. Error={e.Message}");
+                _logger.WriteLine("");
+                _logger.WriteLineDarkRed($"Error in connect to {ip}. Error={e.Message}");
             }
 
-            Console.WriteLine("");
+            await Task.Delay(1000);
+            _logger.WriteLine("");
         }
 
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.WriteLine("Finished.");
+        _logger.WriteLineGray("Finished.");
 
-        Console.WriteLine("");
-        Console.Write("Press Enter to exit....");
+        _logger.WriteLineGray("");
+        _logger.WriteGray("Press Enter to exit....");
         Console.ReadLine();
     }
 
-    private async Task LoadFiles()
-    {
-        ips = await File.ReadAllLinesAsync("ip.txt");
-        commands = await File.ReadAllLinesAsync("command.txt");
-        sec = await File.ReadAllLinesAsync("sec.txt");
-
-    }
 }
