@@ -25,57 +25,64 @@ public class Startup
         _logger.WriteLineGray("Starting...");
         _logger.WriteLine("");
 
-        var ips = _setting.Address.IP;
-        foreach (var ip in ips)
-        {
-            try
-            {
-                var security = ip.Value == null
-                    ? _setting.Security
-                    : ip.Value;
-
-                var ssh = GetCommandProvider();
-
-                _logger.WriteLineGray($"Connecting to {ip.Key}...");
-                var isConnected = ssh.Connect(ip.Key, security);
-
-                if (isConnected)
-                {
-                    _logger.WriteLineGreen($"Connected.");
-                    _logger.WriteLine("");
-                }
-                else
-                {
-                    _logger.WriteLineMagenta("Could not connect, disconnected.");
-                    _logger.WriteLine("");
-                }
-
-                if (isConnected)
-                {
-                    await ssh.Run(_setting.Commands.Lines);
-                }
-
-                ssh.Dispose();
-
-                /*var telnet = _provider.GetService<TelnetService>();
-                telnet.Connect(ip.Key, security);
-                await telnet.Run(_setting.Commands.Lines);*/
-            }
-            catch (Exception e)
-            {
-                _logger.WriteLine("");
-                _logger.WriteLineDarkRed($"Error in connect to {ip}. Error={e.Message}");
-            }
-
-            await Task.Delay(1000);
-            _logger.WriteLine("");
-        }
+        await Run();
 
         _logger.WriteLineGray("Finished.");
 
         _logger.WriteLineGray("");
         _logger.WriteGray("Press Enter to exit....");
         Console.ReadLine();
+    }
+
+    private async Task Run()
+    {
+        var ips = _setting.Address.IP;
+        foreach (var ip in ips)
+        {
+            var security = ip.Value ?? _setting.Security;
+            await RunForIp(ip.Key, security);
+        }
+    }
+
+    private async Task RunForIp(string ip, Security security)
+    {
+        var commandProvider = GetCommandProvider();
+        try
+        {
+            _logger.WriteLineGray($"Connecting to {ip}...");
+            var isConnected = commandProvider.Connect(ip, security);
+
+            if (!isConnected)
+            {
+                _logger.WriteLineMagenta("Could not connect, disconnected.");
+                _logger.WriteLine("");
+                commandProvider?.Dispose();
+                return;
+            }
+
+            _logger.WriteLineGreen("Connected.");
+            _logger.WriteLine("");
+
+            await commandProvider.Run(_setting.Commands.Lines);
+
+            commandProvider.Disconnect();
+            _logger.WriteLineMagenta("");
+            _logger.WriteLineMagenta($"Disconnected from {ip}");
+
+        }
+        catch (Exception e)
+        {
+            _logger.WriteLine("");
+            _logger.WriteLineDarkRed($"Error in connect to {ip}. Error={e.Message}");
+        }
+        finally
+        {
+            commandProvider?.Dispose();
+        }
+
+        await Task.Delay(1000);
+        _logger.WriteLine("");
+
     }
 
     private IProvider GetCommandProvider()

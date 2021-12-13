@@ -37,17 +37,6 @@ public class SshService : IProvider
 
     public async Task Run(IEnumerable<string> commands)
     {
-        if (_client.IsConnected)
-        {
-            _logger.WriteLineGreen($"Connected to {_ip}");
-            _logger.WriteLine("");
-        }
-        else
-        {
-            _logger.WriteLineMagenta("Could not connect, disconnected.");
-            return;
-        }
-
         var stream = _client.CreateShellStream("Customcommand", 0, 0, 0, 0, 10);//1024);
 
         stream.DataReceived += (sender, eventArgs) =>
@@ -80,15 +69,16 @@ public class SshService : IProvider
             await stream.FlushAsync();
         }
 
-        _client.Disconnect();
+    }
 
-        _logger.WriteLineMagenta("");
-        _logger.WriteLineMagenta($"Disconnected from {_ip}");
+    public void Disconnect()
+    {
+        _client.Disconnect();
     }
 
     public void Dispose()
     {
-        _client.Dispose();
+        _client?.Dispose();
     }
 
 }

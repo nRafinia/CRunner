@@ -62,12 +62,11 @@ public class TelnetService : IProvider
             str = ReadMessage(stream);
             _logger.WriteGray(str);
         }
+    }
 
+    public void Disconnect()
+    {
         _client.Close();
-
-        _logger.WriteLineMagenta("");
-        _logger.WriteLineMagenta($"Disconnected from {_ip}");
-
     }
 
     private static string ReadMessage(NetworkStream stream)
