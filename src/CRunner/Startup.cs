@@ -34,9 +34,28 @@ public class Startup
                     ? _setting.Security
                     : ip.Value;
 
-                var ssh = _provider.GetService<SshService>();
-                ssh.Connect(ip.Key, security);
-                await ssh.Run(_setting.Commands.Lines);
+                var ssh = GetCommandProvider();
+
+                _logger.WriteLineGray($"Connecting to {ip.Key}...");
+                var isConnected = ssh.Connect(ip.Key, security);
+
+                if (isConnected)
+                {
+                    _logger.WriteLineGreen($"Connected.");
+                    _logger.WriteLine("");
+                }
+                else
+                {
+                    _logger.WriteLineMagenta("Could not connect, disconnected.");
+                    _logger.WriteLine("");
+                }
+
+                if (isConnected)
+                {
+                    await ssh.Run(_setting.Commands.Lines);
+                }
+
+                ssh.Dispose();
 
                 /*var telnet = _provider.GetService<TelnetService>();
                 telnet.Connect(ip.Key, security);
@@ -57,6 +76,11 @@ public class Startup
         _logger.WriteLineGray("");
         _logger.WriteGray("Press Enter to exit....");
         Console.ReadLine();
+    }
+
+    private IProvider GetCommandProvider()
+    {
+        return _provider.GetService<SshService>();
     }
 
 }

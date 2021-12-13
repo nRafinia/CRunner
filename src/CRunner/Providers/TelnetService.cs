@@ -15,34 +15,32 @@ public class TelnetService : IProvider
         _logger = logger;
     }
 
-    public void Connect(string ip, Security security)
+    public bool Connect(string ip, Security security)
     {
         _ip = ip;
-        _client = new TcpClient(ip, 23);
         _security = security;
+        try
+        {
+            _client = new TcpClient(ip, 23);
+        }
+        catch
+        {
+            //
+        }
+
+        return _client?.Connected ?? false;
     }
 
     public async Task Run(IEnumerable<string> commands)
     {
-        if (_client.Connected)
-        {
-            _logger.WriteLineGreen($"Connected to {_ip}");
-            _logger.WriteLine("");
-        }
-        else
-        {
-            _logger.WriteLineMagenta("Could not connect, disconnected.");
-            _logger.WriteLine("");
-            return;
-        }
-
         var stream = _client.GetStream();
 
-        //var strReader = new StreamReader(stream);
         var str = ReadMessage(stream);
         _logger.WriteGray(str);
 
         await Task.Delay(1000);
+
+        await SendAuthorize(stream);
 
         str = ReadMessage(stream);
         _logger.WriteGray(str);
@@ -70,11 +68,9 @@ public class TelnetService : IProvider
         _logger.WriteLineMagenta("");
         _logger.WriteLineMagenta($"Disconnected from {_ip}");
 
-        await Task.Delay(1000);
-
     }
 
-    public static string ReadMessage(NetworkStream stream)
+    private static string ReadMessage(NetworkStream stream)
     {
         if (!stream.DataAvailable)
             return string.Empty;
@@ -84,6 +80,24 @@ public class TelnetService : IProvider
         var numberOfBytesRead = stream.Read(responseData, 0, responseData.Length);
         var response = System.Text.Encoding.ASCII.GetString(responseData, 0, numberOfBytesRead);
         return response;
+    }
+
+    private async Task SendAuthorize(NetworkStream stream)
+    {
+        var cmd = System.Text.Encoding.ASCII.GetBytes(_security.UserName);
+        await stream.WriteAsync(cmd, 0, cmd.Length);
+        stream.WriteByte(13);
+        await stream.FlushAsync();
+        await Task.Delay(100);
+
+        cmd = System.Text.Encoding.ASCII.GetBytes(_security.Password);
+        await stream.WriteAsync(cmd, 0, cmd.Length);
+        stream.WriteByte(13);
+        await stream.FlushAsync();
+        await Task.Delay(100);
+
+        var str = ReadMessage(stream);
+        _logger.WriteGray(str);
     }
 
     public void Dispose()

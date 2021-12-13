@@ -7,14 +7,14 @@ public class SshService : IProvider
 {
     private string _ip;
     private SshClient _client;
-    private Logger _logger;
+    private readonly Logger _logger;
 
     public SshService(Logger logger)
     {
         _logger = logger;
     }
 
-    public void Connect(string ip, Security security)
+    public bool Connect(string ip, Security security)
     {
         _ip = ip;
         var connectionInfo = new ConnectionInfo(ip,
@@ -22,14 +22,17 @@ public class SshService : IProvider
             security.UserName,
             new PasswordAuthenticationMethod(security.UserName, security.Password)
             /*new PrivateKeyAuthenticationMethod("rsa.key")*/);
+        try
+        {
+            _client = new SshClient(connectionInfo);
+            _client.Connect();
+        }
+        catch
+        {
+            //
+        }
 
-        _client = new SshClient(connectionInfo);
-        _client.Connect();
-    }
-
-    public void Dispose()
-    {
-        _client.Dispose();
+        return _client?.IsConnected ?? false;
     }
 
     public async Task Run(IEnumerable<string> commands)
@@ -82,4 +85,10 @@ public class SshService : IProvider
         _logger.WriteLineMagenta("");
         _logger.WriteLineMagenta($"Disconnected from {_ip}");
     }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+
 }

@@ -4,6 +4,6 @@ namespace CRunner.Providers;
 
 public interface IProvider : IDisposable
 {
-    void Connect(string ip, Security security);
+    bool Connect(string ip, Security security);
     Task Run(IEnumerable<string> commands);
 }
