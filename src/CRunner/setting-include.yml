@@ -1,0 +1,13 @@
+Address:
+  IP:
+    192.168.20.100:
+    192.168.20.101:
+      Mode: Telnet
+      Security:
+        UserName: admin2
+        Password: 1234
+
+Commands:
+  Lines:
+  - enable
+  - Ew@ysNet!))%!)

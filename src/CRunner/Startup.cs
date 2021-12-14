@@ -1,6 +1,5 @@
 ﻿using CRunner.Models;
 using CRunner.Providers;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CRunner;
 
@@ -39,17 +38,18 @@ public class Startup
         var ips = _setting.Address.IP;
         foreach (var ip in ips)
         {
-            var security = ip.Value ?? _setting.Security;
-            await RunForIp(ip.Key, security);
+            var security = ip.Value?.Security ?? _setting.Security;
+            var config = ip.Value ?? new IpConfig(security, ConnectMode.Ssh);
+            await RunForIp(ip.Key, config, security);
         }
     }
 
-    private async Task RunForIp(string ip, Security security)
+    private async Task RunForIp(string ip, IpConfig config, Security security)
     {
-        var commandProvider = GetCommandProvider();
+        var commandProvider = GetCommandProvider(config);
         try
         {
-            _logger.WriteLineGray($"Connecting to {ip}...");
+            _logger.WriteLineGray($"Connecting to {ip} with {config.Mode}...");
             var isConnected = commandProvider.Connect(ip, security);
 
             if (!isConnected)
@@ -85,9 +85,12 @@ public class Startup
 
     }
 
-    private IProvider GetCommandProvider()
+    private IProvider GetCommandProvider(IpConfig config)
     {
-        return _provider.GetService<SshService>();
+        var provider = config.Mode == ConnectMode.Ssh
+            ? typeof(SshService)
+            : typeof(TelnetService);
+        return _provider.GetService(provider) as IProvider;
     }
 
 }

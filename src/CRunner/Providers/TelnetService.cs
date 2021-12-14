@@ -5,7 +5,6 @@ namespace CRunner.Providers;
 
 public class TelnetService : IProvider
 {
-    private string _ip;
     private TcpClient _client;
     private Security _security;
     private readonly Logger _logger;
@@ -17,7 +16,6 @@ public class TelnetService : IProvider
 
     public bool Connect(string ip, Security security)
     {
-        _ip = ip;
         _security = security;
         try
         {
@@ -50,7 +48,9 @@ public class TelnetService : IProvider
             if (cmd.StartsWith("sleep"))
             {
                 var sleep = cmd.Split(":");
-                await Task.Delay(int.Parse(sleep[1]));
+                var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(int.Parse(sleep[1])));
+                await periodicTimer.WaitForNextTickAsync();
+                periodicTimer.Dispose();
                 continue;
             }
 
@@ -67,6 +67,10 @@ public class TelnetService : IProvider
     public void Disconnect()
     {
         _client.Close();
+    }
+    public void Dispose()
+    {
+        _client?.Dispose();
     }
 
     private static string ReadMessage(NetworkStream stream)
@@ -99,8 +103,4 @@ public class TelnetService : IProvider
         _logger.WriteGray(str);
     }
 
-    public void Dispose()
-    {
-        _client?.Dispose();
-    }
 }

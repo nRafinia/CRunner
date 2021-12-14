@@ -2,5 +2,6 @@
 
 public class Address
 {
-    public Dictionary<string, Security> IP { get; set; }
+    public string Include { get; set; }
+    public Dictionary<string, IpConfig> IP { get; set; }
 }

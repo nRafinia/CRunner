@@ -5,7 +5,6 @@ namespace CRunner.Providers;
 
 public class SshService : IProvider
 {
-    private string _ip;
     private SshClient _client;
     private readonly Logger _logger;
 
@@ -16,7 +15,6 @@ public class SshService : IProvider
 
     public bool Connect(string ip, Security security)
     {
-        _ip = ip;
         var connectionInfo = new ConnectionInfo(ip,
             22,
             security.UserName,
@@ -52,14 +50,12 @@ public class SshService : IProvider
             if (cmd.StartsWith("sleep"))
             {
                 var sleep = cmd.Split(":");
-                //await Task.Delay(int.Parse(sleep[1]));
                 var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(int.Parse(sleep[1])));
                 await periodicTimer.WaitForNextTickAsync();
                 periodicTimer.Dispose();
                 continue;
             }
 
-            //stream.WriteLine(cmd);
             foreach (var c in cmd)
             {
                 stream.WriteByte((byte)c);
