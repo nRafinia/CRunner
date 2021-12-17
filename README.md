@@ -1,4 +1,4 @@
-# Command-Runner
+# Command Runner (CRunner)
 Easy write commands and run multiple server
 
 <p align="center" width="100%">
