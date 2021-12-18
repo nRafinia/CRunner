@@ -56,7 +56,7 @@ public class SshService : IProvider
             if (_commandService.Exist(commandItems[0]))
             {
                 var commandHandler = _commandService.Get(commandItems[0]);
-                await commandHandler.GetCommand(commandRunner, commandItems[1..]);
+                await commandHandler.GetCommand(commandRunner, commandItems[1..], _logger);
                 continue;
             }
 

@@ -1,10 +1,10 @@
-﻿namespace CRunner.CommandHandlers;
+﻿namespace CRunner.BuiltInCommands;
 
 public class Sleep : ICommand
 {
     public string CommandName => "sleep";
 
-    public async Task GetCommand(ICommandRunner commandRunner, IEnumerable<string> parameters)
+    public async Task GetCommand(ICommandRunner commandRunner, IEnumerable<string> parameters, ILogger logger)
     {
         if (parameters is null || !parameters.Any())
         {
@@ -17,6 +17,9 @@ public class Sleep : ICommand
         {
             return;
         }
+
+        logger.WriteLineGreen("");
+        logger.WriteLineGreen($" --> Sleep for {delayValue} millisecond...");
 
         var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(delayValue));
         await periodicTimer.WaitForNextTickAsync();

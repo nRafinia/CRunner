@@ -1,6 +1,6 @@
 ﻿namespace CRunner.Providers;
 
-public class Logger
+public class Logger : ILogger
 {
     #region Green
     public void WriteGreen(string text)

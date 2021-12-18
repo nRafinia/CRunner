@@ -4,5 +4,5 @@ public interface ICommand
 {
     string CommandName { get; }
 
-    Task GetCommand(ICommandRunner commandRunner, IEnumerable<string> parameters);
+    Task GetCommand(ICommandRunner commandRunner, IEnumerable<string> parameters, ILogger logger);
 }

@@ -1,10 +1,11 @@
-﻿using CRunner.Tools;
+﻿using System.Reflection;
 
 namespace CRunner.Providers;
 
 public class CommandService
 {
     private readonly List<ICommand> _commandClass = new();
+    private readonly List<Assembly> _assemblies = new();
 
     public CommandService()
     {
@@ -31,16 +32,29 @@ public class CommandService
 
     private void LoadCommandLibraries()
     {
-
+        var modules = Directory.GetFiles("modules", "*.dll");
+        var currentDir = Directory.GetCurrentDirectory();
+        foreach (var module in modules)
+        {
+            var fileByte = File.ReadAllBytes(Path.Combine(currentDir, module));
+            var asm = Assembly.Load(fileByte);
+            _assemblies.Add(asm);
+        }
     }
 
     private void LoadCommandClass()
     {
-        var classes = Globals.GetImplementedInterfaceOf<ICommand>();
-        foreach (var item in classes)
+        //var classes = Globals.GetImplementedInterfaceOf<ICommand>();
+        foreach (var assembly in _assemblies)
         {
-            var command = Activator.CreateInstance(item) as ICommand;
-            _commandClass.Add(command);
+            var classes = assembly.GetTypes()
+                .Where(t => typeof(ICommand).IsAssignableFrom(t) && !t.IsInterface);
+
+            foreach (var item in classes)
+            {
+                var command = Activator.CreateInstance(item) as ICommand;
+                _commandClass.Add(command);
+            }
         }
     }
 }

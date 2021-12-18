@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>crunner.$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>CRunner.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<BaseOutputPath>bin\</BaseOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
+	</ItemGroup>
+
+	<Target Name="CopyDllContent" AfterTargets="AfterBuild">
+		<Copy SourceFiles="bin\Debug\net6.0\crunner.BuiltInCommands.dll" DestinationFolder="..\CRunner\Modules" />
+		<Copy SourceFiles="bin\Debug\net6.0\crunner.BuiltInCommands.pdb" DestinationFolder="..\CRunner\Modules" />
+	</Target>
+
+</Project>
