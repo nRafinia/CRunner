@@ -5,7 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 var setting = await LoadConfig();
 
+if (setting is null)
+{
+    return;
+}
+
 var serviceProvider = new ServiceCollection()
+    .AddSingleton<CommandService>()
     .AddSingleton<Startup>()
     .AddSingleton<SshService>()
     .AddSingleton<TelnetService>()

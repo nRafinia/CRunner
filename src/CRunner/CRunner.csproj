@@ -16,8 +16,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
 		<PackageReference Include="SSH.NET" Version="2020.0.1" />
 		<PackageReference Include="YamlDotNet" Version="11.2.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,6 +32,10 @@
 		<None Update="setting.yml">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="CommandHandlers\" />
 	</ItemGroup>
 
 </Project>

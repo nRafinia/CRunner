@@ -9,11 +9,15 @@ public class Startup
     private readonly RunSetting _setting;
     private readonly Logger _logger;
 
+    private int _index, _total;
+
     public Startup(IServiceProvider provider, RunSetting setting, Logger logger)
     {
         _provider = provider;
         _setting = setting;
         _logger = logger;
+        _index = 0;
+        _total = 0;
     }
 
     public async Task Start()
@@ -36,8 +40,12 @@ public class Startup
     private async Task Run()
     {
         var ips = _setting.Address.IP;
+        _index = 0;
+        _total = ips.Count;
         foreach (var ip in ips)
         {
+            _index++;
+
             var security = ip.Value?.Security ?? _setting.Security;
             var config = ip.Value ?? new IpConfig(security, ConnectMode.Ssh);
             await RunForIp(ip.Key, config, security);
@@ -49,7 +57,7 @@ public class Startup
         var commandProvider = GetCommandProvider(config);
         try
         {
-            _logger.WriteLineGray($"Connecting to {ip} with {config.Mode}...");
+            _logger.WriteLineGray($"Connecting to {ip} with {config.Mode} ({_index}/{_total})...");
             var isConnected = commandProvider.Connect(ip, security);
 
             if (!isConnected)

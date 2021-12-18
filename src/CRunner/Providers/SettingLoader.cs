@@ -8,18 +8,27 @@ public static class SettingLoader
 {
     public static async Task<RunSetting> Load(string path)
     {
-        if (!File.Exists(path))
+        try
         {
-            Console.WriteLine($"Setting file '{path}' not found!");
-            Environment.Exit(0);
-            return default;
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"Setting file '{path}' not found!");
+                Environment.Exit(0);
+                return default;
+            }
+
+            var settingDirectory = Path.GetDirectoryName(path);
+            var setting = await LoadConfig(path);
+            var res = await ProcessConfig(setting, settingDirectory);
+
+            return res;
+        }
+        catch
+        {
+            Console.WriteLine("Error in load setting, Please recheck file and settings.");
         }
 
-        var settingDirectory = Path.GetDirectoryName(path);
-        var setting = await LoadConfig(path);
-        var res = await ProcessConfig(setting, settingDirectory);
-
-        return res;
+        return default;
     }
 
     private static async Task<RunSetting> LoadConfig(string path)

@@ -8,10 +8,12 @@ public class TelnetService : IProvider
     private TcpClient _client;
     private Security _security;
     private readonly Logger _logger;
+    private readonly CommandService _commandService;
 
-    public TelnetService(Logger logger)
+    public TelnetService(Logger logger, CommandService commandService)
     {
         _logger = logger;
+        _commandService = commandService;
     }
 
     public bool Connect(string ip, Security security)
@@ -33,6 +35,8 @@ public class TelnetService : IProvider
     {
         var stream = _client.GetStream();
 
+        var commandRunner = new TelnetCommandRunner(stream);
+
         var str = ReadMessage(stream);
         _logger.WriteGray(str);
 
@@ -45,19 +49,16 @@ public class TelnetService : IProvider
 
         foreach (var cmd in commands)
         {
-            if (cmd.StartsWith("sleep"))
+            var commandItems = cmd.Split(" ");
+
+            if (_commandService.Exist(commandItems[0]))
             {
-                var sleep = cmd.Split(":");
-                var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(int.Parse(sleep[1])));
-                await periodicTimer.WaitForNextTickAsync();
-                periodicTimer.Dispose();
+                var commandHandler = _commandService.Get(commandItems[0]);
+                await commandHandler.GetCommand(commandRunner, commandItems[1..]);
                 continue;
             }
 
-            var cmdByte = System.Text.Encoding.ASCII.GetBytes(cmd);
-            await stream.WriteAsync(cmdByte, 0, cmd.Length);
-            stream.WriteByte(13);
-            await stream.FlushAsync();
+            await commandRunner.Run(cmd);
             await Task.Delay(100);
             str = ReadMessage(stream);
             _logger.WriteGray(str);

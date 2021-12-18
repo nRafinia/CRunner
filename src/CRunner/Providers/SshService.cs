@@ -7,10 +7,12 @@ public class SshService : IProvider
 {
     private SshClient _client;
     private readonly Logger _logger;
+    private readonly CommandService _commandService;
 
-    public SshService(Logger logger)
+    public SshService(Logger logger, CommandService commandService)
     {
         _logger = logger;
+        _commandService = commandService;
     }
 
     public bool Connect(string ip, Security security)
@@ -35,7 +37,9 @@ public class SshService : IProvider
 
     public async Task Run(IEnumerable<string> commands)
     {
-        var stream = _client.CreateShellStream("Customcommand", 0, 0, 0, 0, 10);//1024);
+        var stream = _client.CreateShellStream("CRunner", 0, 0, 0, 0, 10);//1024);
+
+        var commandRunner = new SshCommandRunner(stream);
 
         stream.DataReceived += (sender, eventArgs) =>
         {
@@ -47,22 +51,16 @@ public class SshService : IProvider
 
         foreach (var cmd in commands)
         {
-            if (cmd.StartsWith("sleep"))
+            var commandItems = cmd.Split(" ");
+
+            if (_commandService.Exist(commandItems[0]))
             {
-                var sleep = cmd.Split(":");
-                var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(int.Parse(sleep[1])));
-                await periodicTimer.WaitForNextTickAsync();
-                periodicTimer.Dispose();
+                var commandHandler = _commandService.Get(commandItems[0]);
+                await commandHandler.GetCommand(commandRunner, commandItems[1..]);
                 continue;
             }
 
-            foreach (var c in cmd)
-            {
-                stream.WriteByte((byte)c);
-                await stream.FlushAsync();
-            }
-            stream.WriteByte(13);
-            await stream.FlushAsync();
+            await commandRunner.Run(cmd);
         }
 
     }
