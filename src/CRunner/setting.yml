@@ -2,11 +2,11 @@ Address:
   Include: setting-include.yml
   IP:
     192.168.20.99:
-    192.168.20.1:
-      Mode: Telnet
-      Security:
-        UserName: admin2
-        Password: 1234
+    #192.168.20.1:
+    #  Mode: Telnet
+    #  Security:
+    #    UserName: admin2
+    #    Password: 1234
 Security:
   UserName: admin
   Password: admin
@@ -14,6 +14,4 @@ Commands:
   Include: setting-include.yml
   Lines:
   - show run int gi0/1
-  - sleep:3000
-  - wr
-  - sleep:3000
+  - test

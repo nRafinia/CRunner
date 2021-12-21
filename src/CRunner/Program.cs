@@ -3,12 +3,17 @@ using CRunner.Models;
 using CRunner.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
+var commandService = new CommandService();
+await commandService.LoadCommands();
+
 var setting = await LoadConfig();
 
 if (setting is null)
 {
     return;
 }
+
+setting = commandService.ProcessConfig(setting);
 
 var serviceProvider = new ServiceCollection()
     .AddSingleton<ModuleService>()

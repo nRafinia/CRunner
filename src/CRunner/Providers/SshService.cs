@@ -37,7 +37,7 @@ public class SshService : IProvider
 
     public async Task Run(IEnumerable<string> commands)
     {
-        var stream = _client.CreateShellStream("CRunner", 0, 0, 0, 0, 10);//1024);
+        var stream = _client.CreateShellStream("CRunner", 0, 0, 0, 0, 1024);
 
         var commandRunner = new SshCommandRunner(stream);
 
@@ -51,7 +51,7 @@ public class SshService : IProvider
 
         foreach (var cmd in commands)
         {
-            var commandItems = cmd.Split(" ");
+            var commandItems = cmd.Split(' ');
 
             if (_moduleService.Exist(commandItems[0]))
             {

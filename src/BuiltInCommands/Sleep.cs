@@ -18,9 +18,6 @@ public class Sleep : ICommand
             return;
         }
 
-        logger.WriteLineGreen("");
-        logger.WriteLineGreen($" --> Sleep for {delayValue} millisecond...");
-
         var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(delayValue));
         await periodicTimer.WaitForNextTickAsync();
         periodicTimer.Dispose();

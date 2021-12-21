@@ -1,0 +1,5 @@
+CommandName: test
+Commands:
+  - sleep 3000
+  - wr
+  - sleep 3000
