@@ -11,7 +11,7 @@ if (setting is null)
 }
 
 var serviceProvider = new ServiceCollection()
-    .AddSingleton<CommandService>()
+    .AddSingleton<ModuleService>()
     .AddSingleton<Startup>()
     .AddSingleton<SshService>()
     .AddSingleton<TelnetService>()

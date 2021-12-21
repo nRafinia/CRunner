@@ -2,12 +2,12 @@
 
 namespace CRunner.Providers;
 
-public class CommandService
+public class ModuleService
 {
     private readonly List<ICommand> _commandClass = new();
     private readonly List<Assembly> _assemblies = new();
 
-    public CommandService()
+    public ModuleService()
     {
         LoadCommandModules();
     }

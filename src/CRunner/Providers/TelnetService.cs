@@ -8,12 +8,12 @@ public class TelnetService : IProvider
     private TcpClient _client;
     private Security _security;
     private readonly Logger _logger;
-    private readonly CommandService _commandService;
+    private readonly ModuleService _moduleService;
 
-    public TelnetService(Logger logger, CommandService commandService)
+    public TelnetService(Logger logger, ModuleService moduleService)
     {
         _logger = logger;
-        _commandService = commandService;
+        _moduleService = moduleService;
     }
 
     public bool Connect(string ip, Security security)
@@ -51,9 +51,9 @@ public class TelnetService : IProvider
         {
             var commandItems = cmd.Split(" ");
 
-            if (_commandService.Exist(commandItems[0]))
+            if (_moduleService.Exist(commandItems[0]))
             {
-                var commandHandler = _commandService.Get(commandItems[0]);
+                var commandHandler = _moduleService.Get(commandItems[0]);
                 await commandHandler.GetCommand(commandRunner, commandItems[1..], _logger);
                 continue;
             }

@@ -28,10 +28,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ModuleFiles Include="modules\*.*"/>
+		<ModuleFiles Include="modules\*.*" />
 	</ItemGroup>
 	<Target Name="CopyDllContent" AfterTargets="AfterBuild">
-		<Copy  SourceFiles="@(ModuleFiles)" DestinationFolder="bin\Debug\net6.0\modules" />
+		<Copy SourceFiles="@(ModuleFiles)" DestinationFolder="bin\Debug\net6.0\modules" />
 	</Target>
 	
 	<ItemGroup>
@@ -39,6 +39,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Commands\test.yml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="setting-include.yml">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
