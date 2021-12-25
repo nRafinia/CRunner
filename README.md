@@ -31,3 +31,7 @@ Easy write commands and run multiple server
     - sleep:3000
 ```
 
+## Used repositories:
+- https://github.com/microsoft/dotnet
+- https://github.com/sshnet/SSH.NET
+- https://github.com/aaubry/YamlDotNet
