@@ -14,4 +14,8 @@ public interface ILogger
     void Write(string text);
     void WriteLine(string text, ConsoleColor color);
     void WriteLine(string text);
+    public void MarkupWrite(string text);
+    public void MarkupWriteLine(string text);
+    void ResetColor();
+
 }

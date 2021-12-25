@@ -1,4 +1,6 @@
-﻿namespace CRunner.Providers;
+﻿using Spectre.Console;
+
+namespace CRunner.Providers;
 
 public class Logger : ILogger
 {
@@ -73,5 +75,20 @@ public class Logger : ILogger
         Console.Write(text);
     }
 
+    public void MarkupWrite(string text)
+    {
+        AnsiConsole.Markup(text);
+    }
+
+    public void MarkupWriteLine(string text)
+    {
+        AnsiConsole.MarkupLine(text);
+    }
+
     #endregion
+
+    public void ResetColor()
+    {
+        Console.ResetColor();
+    }
 }

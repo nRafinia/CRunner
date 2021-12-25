@@ -48,6 +48,8 @@ public class Startup
 
             var security = ip.Value?.Security ?? _setting.Security;
             var config = ip.Value ?? new IpConfig(security, ConnectMode.Ssh);
+
+            _logger.ResetColor();
             await RunForIp(ip.Key, config, security);
         }
     }
@@ -57,7 +59,7 @@ public class Startup
         var commandProvider = GetCommandProvider(config);
         try
         {
-            _logger.WriteLineGray($"Connecting to {ip} with {config.Mode} ({_index}/{_total})...");
+            _logger.MarkupWriteLine($"Connecting to [underline green]{ip}[/] with [underline yellow]{config.Mode}[/] ({_index}/{_total})...");
             var isConnected = commandProvider.Connect(ip, security);
 
             if (!isConnected)
