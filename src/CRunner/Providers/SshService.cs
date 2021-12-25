@@ -6,10 +6,10 @@ namespace CRunner.Providers;
 public class SshService : IProvider
 {
     private SshClient _client;
-    private readonly Logger _logger;
+    private readonly ILogger _logger;
     private readonly ModuleService _moduleService;
 
-    public SshService(Logger logger, ModuleService moduleService)
+    public SshService(ILogger logger, ModuleService moduleService)
     {
         _logger = logger;
         _moduleService = moduleService;
@@ -56,7 +56,7 @@ public class SshService : IProvider
             if (_moduleService.Exist(commandItems[0]))
             {
                 var commandHandler = _moduleService.Get(commandItems[0]);
-                await commandHandler.GetCommand(commandRunner, commandItems[1..], _logger);
+                await commandHandler.RunCommand(commandItems[1..]);
                 continue;
             }
 

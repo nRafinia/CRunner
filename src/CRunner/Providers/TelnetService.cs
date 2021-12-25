@@ -7,10 +7,10 @@ public class TelnetService : IProvider
 {
     private TcpClient _client;
     private Security _security;
-    private readonly Logger _logger;
+    private readonly ILogger _logger;
     private readonly ModuleService _moduleService;
 
-    public TelnetService(Logger logger, ModuleService moduleService)
+    public TelnetService(ILogger logger, ModuleService moduleService)
     {
         _logger = logger;
         _moduleService = moduleService;
@@ -54,7 +54,7 @@ public class TelnetService : IProvider
             if (_moduleService.Exist(commandItems[0]))
             {
                 var commandHandler = _moduleService.Get(commandItems[0]);
-                await commandHandler.GetCommand(commandRunner, commandItems[1..], _logger);
+                await commandHandler.RunCommand(commandItems[1..]);
                 continue;
             }
 

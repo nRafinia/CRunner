@@ -7,11 +7,11 @@ public class Startup
 {
     private readonly IServiceProvider _provider;
     private readonly RunSetting _setting;
-    private readonly Logger _logger;
+    private readonly ILogger _logger;
 
     private int _index, _total;
 
-    public Startup(IServiceProvider provider, RunSetting setting, Logger logger)
+    public Startup(IServiceProvider provider, RunSetting setting, ILogger logger)
     {
         _provider = provider;
         _setting = setting;

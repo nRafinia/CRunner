@@ -15,13 +15,19 @@ if (setting is null)
 
 setting = commandService.ProcessConfig(setting);
 
-var serviceProvider = new ServiceCollection()
+
+var serviceCollection = new ServiceCollection();
+
+var moduleService = new ModuleService(null);
+moduleService.LoadCommandModules(serviceCollection);
+
+var serviceProvider = serviceCollection
     .AddSingleton<ModuleService>()
     .AddSingleton<Startup>()
     .AddSingleton<SshService>()
     .AddSingleton<TelnetService>()
     .AddSingleton(setting)
-    .AddSingleton(new Logger())
+    .AddSingleton<ILogger>(new Logger())
     .BuildServiceProvider();
 
 var startup = serviceProvider.GetService<Startup>();

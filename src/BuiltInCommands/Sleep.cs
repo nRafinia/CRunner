@@ -2,9 +2,7 @@
 
 public class Sleep : ICommand
 {
-    public string CommandName => "sleep";
-
-    public async Task GetCommand(ICommandRunner commandRunner, IEnumerable<string> parameters, ILogger logger)
+    public async Task RunCommand(IEnumerable<string> parameters)
     {
         if (parameters is null || !parameters.Any())
         {

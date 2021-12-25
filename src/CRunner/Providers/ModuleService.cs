@@ -1,59 +1,79 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace CRunner.Providers;
 
 public class ModuleService
 {
-    private readonly List<ICommand> _commandClass = new();
-    private readonly List<Assembly> _assemblies = new();
+    private static readonly IDictionary<string, Type> CommandClass = new Dictionary<string, Type>();
 
-    public ModuleService()
+    private readonly IServiceProvider _provider;
+    public ModuleService(IServiceProvider provider)
     {
-        LoadCommandModules();
+        _provider = provider;
+    }
+
+    public void LoadCommandModules(IServiceCollection serviceCollection)
+    {
+        var assemblies = LoadCommandLibraries();
+        LoadCommandClass(assemblies, serviceCollection);
     }
 
     public bool Exist(string commandName)
     {
-        return _commandClass.Any(_ =>
-            string.Equals(_.CommandName, commandName, StringComparison.CurrentCultureIgnoreCase));
+        return CommandClass.ContainsKey(commandName);
     }
 
     public ICommand Get(string commandName)
     {
-        return _commandClass.FirstOrDefault(_ =>
-            string.Equals(_.CommandName, commandName, StringComparison.CurrentCultureIgnoreCase));
+        if (!Exist(commandName))
+        {
+            return default;
+        }
+
+        var command = CommandClass[commandName];
+        var commandProvider = _provider.GetService(command) as ICommand;
+        return commandProvider;
     }
 
-    private void LoadCommandModules()
+    private IEnumerable<Assembly> LoadCommandLibraries()
     {
-        LoadCommandLibraries();
-        LoadCommandClass();
-    }
+        var assemblies = new List<Assembly>();
 
-    private void LoadCommandLibraries()
-    {
         var modules = Directory.GetFiles("modules", "*.dll");
         var currentDir = Directory.GetCurrentDirectory();
         foreach (var module in modules)
         {
             var fileByte = File.ReadAllBytes(Path.Combine(currentDir, module));
             var asm = Assembly.Load(fileByte);
-            _assemblies.Add(asm);
+            assemblies.Add(asm);
         }
+
+        return assemblies;
     }
 
-    private void LoadCommandClass()
+    private void LoadCommandClass(IEnumerable<Assembly> assemblies, IServiceCollection serviceCollection)
     {
-        //var classes = Globals.GetImplementedInterfaceOf<ICommand>();
-        foreach (var assembly in _assemblies)
+        foreach (var assembly in assemblies)
         {
-            var classes = assembly.GetTypes()
-                .Where(t => typeof(ICommand).IsAssignableFrom(t) && !t.IsInterface);
+            var commandLists = assembly.GetTypes()
+                .Where(t => typeof(ICommandList).IsAssignableFrom(t) && !t.IsInterface);
 
-            foreach (var item in classes)
+            foreach (var commandList in commandLists)
             {
-                var command = Activator.CreateInstance(item) as ICommand;
-                _commandClass.Add(command);
+                var commandListClass = Activator.CreateInstance(commandList) as ICommandList;
+
+                foreach (var command in commandListClass?.CommandItems ?? new Dictionary<string, Type>())
+                {
+                    //if (!(command.Value is ICommand))
+                    if (!typeof(ICommand).IsAssignableFrom(command.Value))
+                    {
+                        continue;
+                    }
+
+                    CommandClass.Add(command);
+                    serviceCollection.AddTransient(command.Value);
+                }
             }
         }
     }
