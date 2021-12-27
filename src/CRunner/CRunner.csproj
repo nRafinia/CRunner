@@ -16,7 +16,6 @@
 
 	<ItemGroup>
 	  <Compile Remove="Modules\**" />
-	  <EmbeddedResource Remove="Modules\**" />
 	  <None Remove="Modules\**" />
 	</ItemGroup>
 

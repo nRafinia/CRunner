@@ -10,6 +10,11 @@ public class CommandService
 
     public async Task LoadCommands()
     {
+        if (!Directory.Exists("commands"))
+        {
+            Directory.CreateDirectory("commands");
+        }
+
         var commandFiles = Directory.GetFiles("commands", "*.yml");
         foreach (var commandFile in commandFiles)
         {

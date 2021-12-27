@@ -40,6 +40,11 @@ public class ModuleService
     {
         var assemblies = new List<Assembly>();
 
+        if (!Directory.Exists("modules"))
+        {
+            Directory.CreateDirectory("modules");
+        }
+
         var modules = Directory.GetFiles("modules", "*.dll");
         var currentDir = Directory.GetCurrentDirectory();
         foreach (var module in modules)
